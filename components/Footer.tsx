@@ -12,8 +12,8 @@ const NAV_LINKS = [
 
 const EXTERNAL_LINKS = [
   { label: "Docs", href: "https://docs.shadowlayer.xyz" },
-  { label: "GitHub", href: "https://github.com/shadowlayer" },
-  { label: "X", href: "https://x.com/shadowlayer" },
+  { label: "GitHub", href: "https://github.com/Amir-Akshan" },
+  { label: "X", href: "https://x.com/ShadowLayer_" },
   { label: "Discord", href: "https://discord.gg/shadowlayer" },
 ];
 
