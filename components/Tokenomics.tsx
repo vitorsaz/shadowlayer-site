@@ -82,7 +82,7 @@ export default function Tokenomics() {
                       d={`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`}
                       fill={alloc.color}
                       fillOpacity={0.6}
-                      stroke="#ffffff"
+                      stroke="#f0ece3"
                       strokeWidth="1.5"
                       initial={{ opacity: 0 }}
                       animate={isInView ? { opacity: 1 } : {}}
@@ -97,7 +97,7 @@ export default function Tokenomics() {
               ).elements}
 
               {/* Center circle */}
-              <circle cx="100" cy="100" r="45" fill="#ffffff" />
+              <circle cx="100" cy="100" r="45" fill="#f0ece3" />
               <text
                 x="100"
                 y="95"

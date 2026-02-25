@@ -5,7 +5,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --bg: #ffffff;
+  --bg: #f0ece3;
   --accent: #7c3aed;
 }
 
@@ -36,7 +36,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f5f5f7;
+  background: #e8e4db;
 }
 
 ::-webkit-scrollbar-thumb {
