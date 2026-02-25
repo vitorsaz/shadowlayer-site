@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
+import ParticleWave from "@/components/ParticleWave";
 
 export default function Hero() {
   const ref = useRef<HTMLDivElement>(null);
@@ -11,68 +12,79 @@ export default function Hero() {
     offset: ["start start", "end start"],
   });
 
-  const imgScale = useTransform(scrollYProgress, [0, 1], [1, 0.7]);
-  const imgOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
-  const imgY = useTransform(scrollYProgress, [0, 1], [0, -80]);
-  const orbY1 = useTransform(scrollYProgress, [0, 1], [0, -200]);
-  const orbY2 = useTransform(scrollYProgress, [0, 1], [0, -300]);
-  const orbY3 = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const contentY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+  const contentScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
   return (
     <section
       ref={ref}
-      className="relative h-screen flex items-center justify-center overflow-hidden"
+      className="relative h-screen flex flex-col items-center justify-center overflow-hidden"
     >
-      {/* Parallax background orbs */}
-      <motion.div
-        style={{ y: orbY1 }}
-        className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-[#d5d0c7]/30 blur-[120px]"
-      />
-      <motion.div
-        style={{ y: orbY2 }}
-        className="absolute top-1/3 -right-32 w-80 h-80 rounded-full bg-[#c8c2b8]/20 blur-[100px]"
-      />
-      <motion.div
-        style={{ y: orbY3 }}
-        className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-[#d5d0c7]/10 blur-[150px]"
-      />
+      {/* Particle wave background */}
+      <div className="absolute inset-0 z-0">
+        <ParticleWave />
+      </div>
 
-      {/* Logo image */}
+      {/* Main content */}
       <motion.div
-        style={{ scale: imgScale, opacity: imgOpacity, y: imgY }}
+        style={{ y: contentY, opacity: contentOpacity, scale: contentScale }}
         className="relative z-10 flex flex-col items-center"
       >
+        {/* Logo */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut" }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
         >
           <Image
             src="/logo.png"
             alt="ShadowLayer"
-            width={700}
-            height={350}
-            className="w-[320px] sm:w-[420px] md:w-[550px] lg:w-[700px] h-auto"
+            width={600}
+            height={300}
+            className="w-[220px] sm:w-[300px] md:w-[420px] lg:w-[520px] h-auto select-none"
+            style={{ filter: "invert(1)" }}
             priority
           />
         </motion.div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute -bottom-24 flex flex-col items-center gap-2"
+        {/* Tagline */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-8 font-mono text-xs tracking-[0.3em] uppercase text-fg-muted text-center"
         >
-          <span className="text-muted/50 text-xs tracking-widest uppercase">
-            Scroll
-          </span>
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-px h-8 bg-gradient-to-b from-gray-400/50 to-transparent"
-          />
-        </motion.div>
+          Zero-Knowledge Privacy Protocol
+        </motion.p>
+
+        {/* Sub-tagline */}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.9, delay: 0.75, ease: [0.16, 1, 0.3, 1] }}
+          className="mt-3 font-sans text-sm text-fg-faint text-center"
+        >
+          Confidential transactions on Solana
+        </motion.p>
+      </motion.div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.2, duration: 1 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center"
+      >
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{
+            duration: 2.5,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="w-px h-12 bg-gradient-to-b from-fg-faint to-transparent"
+        />
       </motion.div>
     </section>
   );

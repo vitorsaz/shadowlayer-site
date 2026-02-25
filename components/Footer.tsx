@@ -1,75 +1,92 @@
 "use client";
 
-import Link from "next/link";
+import { motion } from "framer-motion";
 
-const FOOTER_LINKS = {
-  Protocol: [
-    { label: "About", href: "#about" },
-    { label: "Technology", href: "#technology" },
-    { label: "Tokenomics", href: "#tokenomics" },
-    { label: "Roadmap", href: "#roadmap" },
-  ],
-  Resources: [
-    { label: "Documentation", href: "/docs" },
-    { label: "Whitepaper", href: "#" },
-    { label: "GitHub", href: "#" },
-    { label: "Audit Reports", href: "#" },
-  ],
-  Community: [
-    { label: "Twitter / X", href: "#" },
-    { label: "Discord", href: "#" },
-  ],
-};
+const NAV_LINKS = [
+  { label: "About", href: "#about" },
+  { label: "Protocol", href: "#protocol" },
+  { label: "Technology", href: "#technology" },
+  { label: "Tokenomics", href: "#tokenomics" },
+  { label: "Roadmap", href: "#roadmap" },
+];
+
+const EXTERNAL_LINKS = [
+  { label: "Docs", href: "https://docs.shadowlayer.xyz" },
+  { label: "GitHub", href: "https://github.com/shadowlayer" },
+  { label: "X", href: "https://x.com/shadowlayer" },
+  { label: "Discord", href: "https://discord.gg/shadowlayer" },
+];
 
 export default function Footer() {
   return (
-    <footer className="relative border-t border-border bg-surface/50">
-      <div className="max-w-6xl mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-4 gap-12">
-          {/* Brand */}
-          <div>
-            <span className="text-gray-900 font-bold text-lg tracking-[0.1em] uppercase">
-              Shadow<span className="text-accent">Layer</span>
-            </span>
-            <p className="mt-4 text-sm text-muted leading-relaxed">
-              Zero-Knowledge Privacy Protocol native to the Solana Runtime.
-            </p>
-            <p className="mt-4 text-xs text-muted/50 font-mono">
-              [email protected]
-            </p>
+    <footer className="border-t border-border">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Row 1: Brand + Nav links */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 py-8"
+        >
+          {/* Left: Brand */}
+          <span className="font-mono text-sm tracking-widest uppercase text-fg">
+            ShadowLayer
+          </span>
+
+          {/* Right: Nav links */}
+          <nav className="flex flex-wrap items-center gap-6">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                className="font-mono text-xs text-fg-muted hover:text-fg transition-colors duration-300"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </motion.div>
+
+        {/* Divider between rows */}
+        <div className="border-t border-border" />
+
+        {/* Row 2: Copyright + External links + Email */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.1 }}
+          className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 py-8"
+        >
+          {/* Left: Copyright */}
+          <span className="font-mono text-xs text-fg-faint">
+            &copy; 2026 ShadowLayer Foundation
+          </span>
+
+          {/* Center: External links */}
+          <div className="flex flex-wrap items-center gap-6">
+            {EXTERNAL_LINKS.map((link) => (
+              <a
+                key={link.label}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-mono text-xs text-fg-faint hover:text-fg-muted transition-colors duration-300"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
 
-          {/* Links */}
-          {Object.entries(FOOTER_LINKS).map(([category, links]) => (
-            <div key={category}>
-              <h4 className="text-sm font-semibold text-gray-900 mb-4">
-                {category}
-              </h4>
-              <ul className="space-y-3">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-muted hover:text-gray-900 transition-colors duration-300"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-16 pt-8 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted">
-            &copy; {new Date().getFullYear()} ShadowLayer Foundation. All rights
-            reserved.
-          </p>
-          <p className="text-xs text-muted/50 font-mono">
-            v0.9.1-alpha &middot; Draft &middot; Not for distribution
-          </p>
-        </div>
+          {/* Right: Email */}
+          <a
+            href="mailto:contact@shadowlayer.xyz"
+            className="font-mono text-xs text-fg-faint hover:text-fg-muted transition-colors duration-300"
+          >
+            contact@shadowlayer.xyz
+          </a>
+        </motion.div>
       </div>
     </footer>
   );

@@ -1,77 +1,112 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
+
+const STATS = [
+  { value: "< 200ms", label: "Proof Generation" },
+  { value: "< 50k", label: "Compute Units" },
+  { value: "100%", label: "On-Chain Privacy" },
+  { value: "Zero", label: "Trusted Setup" },
+];
 
 export default function About() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+
+  const fadeUp = (delay: number = 0) => ({
+    initial: { opacity: 0, y: 30 },
+    animate: isInView ? { opacity: 1, y: 0 } : {},
+    transition: { duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] },
   });
 
-  const bgY = useTransform(scrollYProgress, [0, 1], [100, -100]);
-
   return (
-    <section id="about" ref={ref} className="relative py-32 md:py-44 overflow-hidden">
-      {/* Parallax background */}
-      <motion.div
-        style={{ y: bgY }}
-        className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-accent/[0.02] blur-[150px]"
-      />
-
-      <div className="max-w-5xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center"
-        >
-          <span className="text-accent text-sm font-mono tracking-widest uppercase">
-            Protocol
-          </span>
-          <h2 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-            Financial privacy as a{" "}
-            <span className="text-gradient">fundamental right</span>
-          </h2>
-        </motion.div>
-
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="mt-8 text-lg md:text-xl text-muted leading-relaxed text-center max-w-3xl mx-auto"
-        >
-          ShadowLayer is a privacy-preserving token protocol deployed natively on
-          Solana. Through Groth16 zkSNARKs and Pedersen commitments, it achieves
-          simultaneous sender anonymity, recipient anonymity, and amount
-          confidentiality — without bridges or separate layers.
-        </motion.p>
-
-        {/* Key stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6"
-        >
-          {[
-            { value: "< 0.4s", label: "Finality" },
-            { value: "192 B", label: "Proof Size" },
-            { value: "~$0.0002", label: "Tx Cost" },
-            { value: "4.3B", label: "Max Notes" },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              className="text-center p-6 rounded-2xl bg-surface/50 border border-border/50"
+    <section
+      id="about"
+      ref={sectionRef}
+      className="relative py-32 md:py-44 overflow-hidden"
+    >
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
+        {/* Two-column layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24">
+          {/* Left column */}
+          <div>
+            <motion.span
+              {...fadeUp(0)}
+              className="block font-mono text-[10px] tracking-[0.3em] uppercase text-accent mb-6"
             >
-              <div className="text-2xl md:text-3xl font-bold text-gray-900 font-mono">
-                {stat.value}
-              </div>
-              <div className="mt-2 text-sm text-muted">{stat.label}</div>
-            </div>
-          ))}
+              ABOUT
+            </motion.span>
+
+            <motion.h2
+              {...fadeUp(0.1)}
+              className="font-sans text-heading text-fg"
+            >
+              Privacy infrastructure for Solana
+            </motion.h2>
+          </div>
+
+          {/* Right column */}
+          <div className="lg:pt-10">
+            <motion.p
+              {...fadeUp(0.2)}
+              className="font-sans text-sm text-fg-muted leading-relaxed"
+            >
+              ShadowLayer is a zero-knowledge privacy protocol built natively on
+              Solana. By leveraging Groth16 zkSNARKs and Pedersen Commitments, it
+              enables fully confidential transactions where sender identity,
+              recipient identity, and transfer amounts remain cryptographically
+              shielded -- without bridges, sidechains, or off-chain sequencers.
+            </motion.p>
+
+            <motion.p
+              {...fadeUp(0.3)}
+              className="mt-5 font-sans text-sm text-fg-muted leading-relaxed"
+            >
+              Every shielded transaction produces a single compact proof that is
+              verified entirely on-chain. The protocol requires no trusted setup
+              ceremonies and introduces no additional trust assumptions beyond
+              Solana's consensus itself, delivering pure cryptographic certainty
+              at network speed.
+            </motion.p>
+          </div>
+        </div>
+
+        {/* Stats row */}
+        <motion.div
+          {...fadeUp(0.4)}
+          className="mt-24 md:mt-32"
+        >
+          {/* Top border */}
+          <div className="h-px w-full bg-border mb-10" />
+
+          <div className="grid grid-cols-2 md:grid-cols-4">
+            {STATS.map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                animate={isInView ? { opacity: 1, y: 0 } : {}}
+                transition={{
+                  duration: 0.6,
+                  delay: 0.5 + i * 0.1,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className={`relative py-6 md:py-0 ${
+                  i > 0 ? "md:border-l md:border-border md:pl-8 lg:pl-10" : ""
+                } ${i < STATS.length - 1 ? "md:pr-8 lg:pr-10" : ""} ${
+                  i % 2 === 1 ? "border-l border-border pl-6 md:pl-8 lg:pl-10" : ""
+                } ${i >= 2 ? "border-t border-border md:border-t-0" : ""}`}
+              >
+                <div className="font-mono text-2xl text-fg">{stat.value}</div>
+                <div className="mt-2 font-mono text-xs text-fg-faint uppercase tracking-wide">
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Bottom border */}
+          <div className="h-px w-full bg-border mt-10" />
         </motion.div>
       </div>
     </section>

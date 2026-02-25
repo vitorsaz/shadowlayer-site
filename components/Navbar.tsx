@@ -6,11 +6,10 @@ import Link from "next/link";
 
 const NAV_LINKS = [
   { label: "About", href: "#about" },
+  { label: "Protocol", href: "#protocol" },
   { label: "Technology", href: "#technology" },
   { label: "Tokenomics", href: "#tokenomics" },
   { label: "Roadmap", href: "#roadmap" },
-  { label: "Team", href: "#team" },
-  { label: "Docs", href: "/docs" },
 ];
 
 export default function Navbar() {
@@ -18,97 +17,159 @@ export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", onScroll);
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  const handleSmoothScroll = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      const target = document.querySelector(href);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth" });
+      }
+      setMobileOpen(false);
+    }
+  };
 
   return (
     <>
       <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? "bg-[#f0ece3]/80 backdrop-blur-xl border-b border-border"
-            : "bg-transparent"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, delay: 0.2 }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 border-b border-border ${
+          scrolled ? "glass" : "bg-transparent"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="group">
-            <span className="text-gray-900 font-bold text-lg tracking-[0.1em] uppercase">
-              Shadow<span className="text-accent">Layer</span>
-            </span>
+        <div className="max-w-7xl mx-auto px-6 md:px-8 h-16 flex items-center justify-between">
+          {/* Left: Brand */}
+          <Link
+            href="/"
+            className="font-mono text-sm text-fg tracking-[0.2em] uppercase select-none"
+          >
+            ShadowLayer
           </Link>
 
-          {/* Desktop */}
+          {/* Center: Nav links */}
           <div className="hidden md:flex items-center gap-8">
             {NAV_LINKS.map((link) => (
-              <Link
+              <a
                 key={link.label}
                 href={link.href}
-                className="text-sm text-muted hover:text-gray-900 transition-colors duration-300"
+                onClick={(e) => handleSmoothScroll(e, link.href)}
+                className="font-mono text-xs uppercase tracking-wider text-fg-muted hover:text-fg transition-colors duration-300"
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
-            <a
-              href="#"
-              className="text-sm px-5 py-2 rounded-full bg-accent/10 border border-accent/30 text-accent hover:bg-accent/20 transition-all duration-300"
-            >
-              Launch App
-            </a>
           </div>
 
-          {/* Mobile toggle */}
+          {/* Right: Docs link */}
+          <div className="hidden md:flex items-center">
+            <Link
+              href="/docs"
+              className="font-mono text-xs uppercase tracking-wider text-fg-muted hover:text-fg transition-colors duration-300"
+            >
+              Docs
+            </Link>
+          </div>
+
+          {/* Mobile hamburger */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden flex flex-col gap-1.5 p-2"
+            className="md:hidden relative z-50 p-2 -mr-2"
+            aria-label="Toggle menu"
           >
-            <motion.span
-              animate={mobileOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-              className="block w-5 h-px bg-gray-900"
-            />
-            <motion.span
-              animate={mobileOpen ? { opacity: 0 } : { opacity: 1 }}
-              className="block w-5 h-px bg-gray-900"
-            />
-            <motion.span
-              animate={mobileOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-              className="block w-5 h-px bg-gray-900"
-            />
+            <div className="w-5 flex flex-col gap-[5px]">
+              <motion.span
+                animate={
+                  mobileOpen
+                    ? { rotate: 45, y: 7, backgroundColor: "#ffffff" }
+                    : { rotate: 0, y: 0, backgroundColor: "#ffffff" }
+                }
+                transition={{ duration: 0.3 }}
+                className="block h-px w-full bg-fg origin-center"
+              />
+              <motion.span
+                animate={
+                  mobileOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }
+                }
+                transition={{ duration: 0.2 }}
+                className="block h-px w-full bg-fg origin-center"
+              />
+              <motion.span
+                animate={
+                  mobileOpen
+                    ? { rotate: -45, y: -7, backgroundColor: "#ffffff" }
+                    : { rotate: 0, y: 0, backgroundColor: "#ffffff" }
+                }
+                transition={{ duration: 0.3 }}
+                className="block h-px w-full bg-fg origin-center"
+              />
+            </div>
           </button>
         </div>
       </motion.nav>
 
-      {/* Mobile menu */}
+      {/* Mobile menu panel */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-[#f0ece3]/95 backdrop-blur-xl pt-20 px-6 md:hidden"
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-40 bg-bg/98 backdrop-blur-xl pt-24 px-8 md:hidden"
           >
-            <div className="flex flex-col gap-6">
-              {NAV_LINKS.map((link) => (
-                <Link
+            <nav className="flex flex-col gap-1">
+              {NAV_LINKS.map((link, i) => (
+                <motion.div
                   key={link.label}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="text-2xl text-gray-700 hover:text-gray-900 transition-colors"
+                  initial={{ opacity: 0, x: -16 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 + i * 0.06, duration: 0.4 }}
                 >
-                  {link.label}
-                </Link>
+                  <a
+                    href={link.href}
+                    onClick={(e) => handleSmoothScroll(e, link.href)}
+                    className="block py-4 font-mono text-lg text-fg tracking-wider uppercase border-b border-border"
+                  >
+                    {link.label}
+                  </a>
+                </motion.div>
               ))}
-              <a
-                href="#"
-                className="text-lg px-6 py-3 rounded-full bg-accent/10 border border-accent/30 text-accent text-center mt-4"
+
+              <motion.div
+                initial={{ opacity: 0, x: -16 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.05 + NAV_LINKS.length * 0.06, duration: 0.4 }}
               >
-                Launch App
-              </a>
-            </div>
+                <Link
+                  href="/docs"
+                  onClick={() => setMobileOpen(false)}
+                  className="block py-4 font-mono text-lg text-accent tracking-wider uppercase"
+                >
+                  Docs
+                </Link>
+              </motion.div>
+            </nav>
           </motion.div>
         )}
       </AnimatePresence>

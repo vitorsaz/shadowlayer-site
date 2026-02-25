@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 
-const TEAM = [
+const MEMBERS = [
   {
     name: "Amir Akshan",
     role: "Co-Founder",
@@ -23,39 +23,86 @@ const TEAM = [
 
 export default function Team() {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const inView = useInView(ref, { once: true, margin: "-100px" });
 
   return (
-    <section id="team" ref={ref} className="relative py-32 md:py-44">
-      <div className="max-w-5xl mx-auto px-6">
+    <section
+      id="team"
+      ref={ref}
+      className="relative py-32 md:py-44 px-6"
+    >
+      <div className="max-w-5xl mx-auto">
+        {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-20"
         >
-          <span className="text-accent text-sm font-mono tracking-widest uppercase">
-            Team
+          <span className="font-mono text-[10px] tracking-[0.3em] text-accent uppercase">
+            PEOPLE
           </span>
-          <h2 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-            The <span className="text-gradient">builders</span>
+          <h2 className="font-sans text-heading text-fg mt-4">
+            Team
           </h2>
         </motion.div>
 
-        <div className="mt-16 grid md:grid-cols-3 gap-8">
-          {TEAM.map((member, i) => (
+        {/* Desktop: 3 columns with vertical border dividers */}
+        <div className="hidden md:grid md:grid-cols-3">
+          {MEMBERS.map((member, i) => (
             <motion.div
               key={member.name}
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.2 + i * 0.15 }}
-              className="text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{
+                duration: 0.7,
+                delay: 0.2 + 0.12 * i,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className={`py-2 ${
+                i < MEMBERS.length - 1
+                  ? "pr-12 border-r border-border"
+                  : ""
+              } ${i > 0 ? "pl-12" : ""}`}
             >
-              <h3 className="text-lg font-semibold text-gray-900">
+              <h3 className="font-sans text-xl text-fg">
                 {member.name}
               </h3>
-              <p className="text-sm text-accent font-medium mt-1">{member.role}</p>
-              <p className="text-xs text-muted mt-1">{member.org}</p>
+              <p className="font-mono text-xs text-fg-muted mt-2">
+                {member.role}
+              </p>
+              <p className="font-mono text-xs text-fg-faint mt-1">
+                {member.org}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Mobile: vertical stack with horizontal borders */}
+        <div className="md:hidden">
+          {MEMBERS.map((member, i) => (
+            <motion.div
+              key={member.name}
+              initial={{ opacity: 0, y: 15 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{
+                duration: 0.7,
+                delay: 0.15 * i,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className={`py-8 ${
+                i < MEMBERS.length - 1 ? "border-b border-border" : ""
+              } ${i === 0 ? "pt-0" : ""}`}
+            >
+              <h3 className="font-sans text-xl text-fg">
+                {member.name}
+              </h3>
+              <p className="font-mono text-xs text-fg-muted mt-2">
+                {member.role}
+              </p>
+              <p className="font-mono text-xs text-fg-faint mt-1">
+                {member.org}
+              </p>
             </motion.div>
           ))}
         </div>

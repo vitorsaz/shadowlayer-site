@@ -1,151 +1,120 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 
-const BENCHMARKS = [
-  {
-    metric: "Proof Generation",
-    value: "1.21s",
-    sub: "WASM single-thread",
-    native: "0.34s native",
-  },
-  {
-    metric: "Proof Size",
-    value: "192",
-    unit: "bytes",
-    sub: "3 compressed curve points",
-  },
-  {
-    metric: "On-Chain Verification",
-    value: "198K",
-    unit: "CU",
-    sub: "~$0.0002 at current fees",
-  },
-  {
-    metric: "Transaction Finality",
-    value: "~380",
-    unit: "ms",
-    sub: "Solana median finality",
-  },
+const MAIN_STATS = [
+  { value: "~180ms", label: "Proof Generation" },
+  { value: "~45,000", label: "Compute Units" },
+  { value: "$0.001", label: "Cost per Tx" },
 ];
 
-const CU_BREAKDOWN = [
-  { label: "Proof deserialization", cu: 12400, pct: 6.3 },
-  { label: "Public input accumulation", cu: 38200, pct: 19.3 },
-  { label: "Miller loop (×3)", cu: 89600, pct: 45.3 },
-  { label: "Final exponentiation", cu: 41800, pct: 21.1 },
-  { label: "Nullifier + Merkle write", cu: 16000, pct: 8.1 },
+const TABLE_ROWS = [
+  { operation: "Deposit", time: "~180ms", cu: "~45k CU" },
+  { operation: "Shield Transfer", time: "~120ms", cu: "~38k CU" },
+  { operation: "Withdrawal", time: "~200ms", cu: "~48k CU" },
+  { operation: "Proof Verify", time: "~5ms", cu: "~12k CU" },
 ];
 
 export default function Performance() {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-
-  const bgY = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="relative py-32 md:py-44 overflow-hidden">
-      <motion.div
-        style={{ y: bgY }}
-        className="absolute -left-40 top-1/3 w-[500px] h-[500px] rounded-full bg-purple-200/20 blur-[150px]"
-      />
-
-      <div className="max-w-6xl mx-auto px-6">
+    <section
+      id="performance"
+      ref={ref}
+      className="relative py-32 md:py-44 px-6 overflow-hidden"
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-20 md:mb-28"
         >
-          <span className="text-accent text-sm font-mono tracking-widest uppercase">
-            Benchmarks
+          <span className="font-mono text-[10px] tracking-[0.3em] text-accent uppercase block mb-4">
+            BENCHMARKS
           </span>
-          <h2 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-            Engineered for{" "}
-            <span className="text-gradient">speed</span>
+          <h2 className="font-sans text-heading text-fg">
+            Performance
           </h2>
-          <p className="mt-4 text-muted text-lg">
-            Measured on consumer hardware (Apple M2, 16GB RAM)
-          </p>
         </motion.div>
 
-        {/* Main metrics */}
-        <div className="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-5">
-          {BENCHMARKS.map((b, i) => (
+        {/* Main stats row */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 mb-20 md:mb-28">
+          {MAIN_STATS.map((stat, i) => (
             <motion.div
-              key={b.metric}
+              key={stat.label}
               initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.2 + i * 0.1 }}
-              className="p-6 rounded-2xl bg-surface/30 border border-border/50 text-center"
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{
+                duration: 0.8,
+                delay: 0.15 + i * 0.12,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="text-center md:text-left"
             >
-              <div className="text-xs text-muted font-mono uppercase tracking-wider mb-3">
-                {b.metric}
-              </div>
-              <div className="flex items-baseline justify-center gap-1">
-                <span className="text-3xl md:text-4xl font-bold text-gray-900 font-mono">
-                  {b.value}
-                </span>
-                {b.unit && (
-                  <span className="text-sm text-muted font-mono">
-                    {b.unit}
-                  </span>
-                )}
-              </div>
-              <div className="mt-2 text-xs text-muted/70">{b.sub}</div>
-              {b.native && (
-                <div className="mt-1 text-xs text-accent/60 font-mono">
-                  {b.native}
-                </div>
-              )}
+              <span className="font-mono text-4xl md:text-5xl text-fg block">
+                {stat.value}
+              </span>
+              <span className="font-mono text-xs text-fg-faint uppercase tracking-wider mt-3 block">
+                {stat.label}
+              </span>
             </motion.div>
           ))}
         </div>
 
-        {/* CU Breakdown */}
+        {/* Comparison table */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="mt-12 p-8 rounded-2xl bg-surface/30 border border-border/50"
+          initial={{ opacity: 0, y: 25 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="border border-border rounded-lg bg-bg-card overflow-hidden"
         >
-          <div className="text-sm font-semibold text-gray-900 mb-6">
-            Compute Unit Breakdown
-          </div>
-          <div className="space-y-4">
-            {CU_BREAKDOWN.map((item) => (
-              <div key={item.label}>
-                <div className="flex justify-between text-sm mb-1.5">
-                  <span className="text-muted">{item.label}</span>
-                  <span className="font-mono text-gray-800">
-                    {item.cu.toLocaleString()} CU
-                  </span>
-                </div>
-                <div className="h-1.5 bg-border/30 rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={isInView ? { width: `${item.pct}%` } : {}}
-                    transition={{ duration: 1, delay: 0.8 }}
-                    className="h-full rounded-full bg-gradient-to-r from-accent/60 to-accent/30"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="mt-4 pt-4 border-t border-border/30 flex justify-between text-sm">
-            <span className="text-gray-900 font-semibold">Total</span>
-            <span className="font-mono text-accent">
-              198,000 CU{" "}
-              <span className="text-muted/50 font-normal">
-                / 1,400,000 limit
-              </span>
-            </span>
-          </div>
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border">
+                <th className="text-left font-mono text-xs text-fg-faint uppercase tracking-wider px-6 py-4">
+                  Operation
+                </th>
+                <th className="text-left font-mono text-xs text-fg-faint uppercase tracking-wider px-6 py-4">
+                  Time
+                </th>
+                <th className="text-left font-mono text-xs text-fg-faint uppercase tracking-wider px-6 py-4">
+                  CU Cost
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {TABLE_ROWS.map((row, i) => (
+                <motion.tr
+                  key={row.operation}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={inView ? { opacity: 1, x: 0 } : {}}
+                  transition={{
+                    duration: 0.5,
+                    delay: 0.6 + i * 0.08,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  className={
+                    i < TABLE_ROWS.length - 1 ? "border-b border-border" : ""
+                  }
+                >
+                  <td className="font-mono text-xs text-fg-muted px-6 py-4">
+                    {row.operation}
+                  </td>
+                  <td className="font-mono text-xs text-fg-muted px-6 py-4 tabular-nums">
+                    {row.time}
+                  </td>
+                  <td className="font-mono text-xs text-fg-muted px-6 py-4 tabular-nums">
+                    {row.cu}
+                  </td>
+                </motion.tr>
+              ))}
+            </tbody>
+          </table>
         </motion.div>
       </div>
     </section>

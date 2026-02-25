@@ -4,15 +4,10 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "ShadowLayer — Zero-Knowledge Privacy on Solana",
   description:
-    "Confidential transactions via Groth16 zkSNARKs and Pedersen Commitments on Solana. Sender anonymity, recipient anonymity, and amount confidentiality.",
-  keywords: [
-    "ShadowLayer",
-    "zero-knowledge",
-    "zkSNARK",
-    "Solana",
-    "privacy",
-    "confidential transactions",
-  ],
+    "Confidential transactions via Groth16 zkSNARKs and Pedersen Commitments on Solana.",
+  icons: {
+    icon: "/favicon.png",
+  },
 };
 
 export default function RootLayout({
@@ -22,10 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="antialiased">
-      <body>
-        <div className="noise-bg" />
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

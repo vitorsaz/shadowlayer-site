@@ -1,116 +1,111 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 
 const STEPS = [
   {
-    step: "01",
+    number: "01",
+    title: "Deposit",
+    description:
+      "Assets enter the shielded pool via a deposit transaction. A commitment is generated using Pedersen Commitments.",
+  },
+  {
+    number: "02",
     title: "Shield",
-    subtitle: "Public → Private",
     description:
-      "Deposit SPL tokens into the ShadowLayer program. A note commitment is created and inserted into the on-chain Merkle accumulator. The shielding transaction is fully transparent.",
-    color: "from-violet-500/20 to-purple-600/20",
+      "The protocol generates a Groth16 zkSNARK proof, creating a shielded state that hides amount and sender.",
   },
   {
-    step: "02",
-    title: "Transfer",
-    subtitle: "Private → Private",
+    number: "03",
+    title: "Transact",
     description:
-      "The core privacy operation. Spend input notes and create output notes with a single Groth16 proof that verifies Merkle membership, nullifier correctness, value conservation, and range bounds.",
-    color: "from-purple-600/20 to-indigo-600/20",
+      "Shielded transfers occur within the pool. Each transaction produces a new proof without revealing details.",
   },
   {
-    step: "03",
-    title: "Unshield",
-    subtitle: "Private → Public",
+    number: "04",
+    title: "Withdraw",
     description:
-      "Withdraw tokens back to a standard SPL account. A simplified proof demonstrates ownership of the note and correct nullifier derivation. Tokens return to the public domain.",
-    color: "from-indigo-600/20 to-blue-600/20",
+      "Assets exit the pool with a withdrawal proof. Only the recipient knows the amount and source.",
   },
 ];
 
 export default function HowItWorks() {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-
-  const lineHeight = useTransform(scrollYProgress, [0.1, 0.8], ["0%", "100%"]);
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(sectionRef, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="relative py-32 md:py-44 overflow-hidden">
-      <div className="max-w-5xl mx-auto px-6">
+    <section
+      id="how-it-works"
+      ref={sectionRef}
+      className="relative py-32 md:py-44 overflow-hidden"
+    >
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center"
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-20 md:mb-28"
         >
-          <span className="text-accent text-sm font-mono tracking-widest uppercase">
-            Flow
+          <span className="font-mono text-[10px] tracking-[0.3em] text-accent uppercase block mb-4">
+            ARCHITECTURE
           </span>
-          <h2 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-            How it <span className="text-gradient">works</span>
+          <h2 className="font-sans text-heading text-fg">
+            How It Works
           </h2>
         </motion.div>
 
-        <div className="mt-20 relative">
-          {/* Animated vertical line */}
-          <div className="absolute left-[23px] md:left-1/2 md:-translate-x-px top-0 bottom-0 w-px bg-border/30">
+        {/* Timeline */}
+        <div className="relative pl-8 md:pl-12">
+          {/* Vertical line */}
+          <motion.div
+            initial={{ scaleY: 0 }}
+            animate={isInView ? { scaleY: 1 } : {}}
+            transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
+            className="absolute left-0 top-0 bottom-0 w-px bg-border origin-top"
+            style={{ left: "6px" }}
+          />
+
+          {STEPS.map((step, i) => (
             <motion.div
-              style={{ height: lineHeight }}
-              className="w-full bg-gradient-to-b from-accent/60 to-accent/10"
-            />
-          </div>
-
-          <div className="space-y-16 md:space-y-24">
-            {STEPS.map((step, i) => (
+              key={step.number}
+              initial={{ opacity: 0, y: 40 }}
+              animate={isInView ? { opacity: 1, y: 0 } : {}}
+              transition={{
+                duration: 0.8,
+                delay: 0.3 + i * 0.15,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="relative mb-16 last:mb-0"
+            >
+              {/* Gold dot on the vertical line */}
               <motion.div
-                key={step.step}
-                initial={{ opacity: 0, y: 40 }}
-                animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.6, delay: 0.3 + i * 0.2 }}
-                className={`relative flex flex-col md:flex-row items-start gap-6 md:gap-12 ${
-                  i % 2 === 1 ? "md:flex-row-reverse" : ""
-                }`}
-              >
-                {/* Step number dot */}
-                <div className="absolute left-[16px] md:left-1/2 md:-translate-x-1/2 w-[15px] h-[15px] rounded-full bg-bg border-2 border-accent/60 z-10" />
+                initial={{ scale: 0 }}
+                animate={isInView ? { scale: 1 } : {}}
+                transition={{
+                  duration: 0.4,
+                  delay: 0.4 + i * 0.15,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="absolute w-[13px] h-[13px] rounded-full bg-accent"
+                style={{ left: "-8px", top: "2px", marginLeft: "6px" }}
+              />
 
-                {/* Content */}
-                <div
-                  className={`ml-12 md:ml-0 md:w-1/2 ${
-                    i % 2 === 1 ? "md:text-right" : ""
-                  }`}
-                >
-                  <div
-                    className={`inline-flex items-center gap-3 ${
-                      i % 2 === 1 ? "md:flex-row-reverse" : ""
-                    }`}
-                  >
-                    <span className="text-accent font-mono text-sm">
-                      {step.step}
-                    </span>
-                    <span className="text-xs text-muted font-mono px-2 py-1 rounded-full border border-border/50">
-                      {step.subtitle}
-                    </span>
-                  </div>
-                  <h3 className="mt-3 text-2xl md:text-3xl font-bold text-gray-900">
-                    {step.title}
-                  </h3>
-                  <p className="mt-3 text-muted leading-relaxed">
-                    {step.description}
-                  </p>
-                </div>
-
-                {/* Spacer for alternating layout */}
-                <div className="hidden md:block md:w-1/2" />
-              </motion.div>
-            ))}
-          </div>
+              {/* Step content */}
+              <div className="ml-8 md:ml-12">
+                <span className="font-mono text-accent text-xs block mb-2">
+                  {step.number}
+                </span>
+                <h3 className="font-sans text-lg text-fg mb-2">
+                  {step.title}
+                </h3>
+                <p className="font-sans text-sm text-fg-muted leading-relaxed max-w-lg">
+                  {step.description}
+                </p>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

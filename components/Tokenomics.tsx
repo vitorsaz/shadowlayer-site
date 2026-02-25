@@ -1,166 +1,124 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 
 const ALLOCATIONS = [
-  { label: "Protocol Treasury", pct: 30, vesting: "4-year linear, 1-year cliff", color: "#8b5cf6" },
-  { label: "Community / Ecosystem", pct: 25, vesting: "Governance milestones", color: "#a78bfa" },
-  { label: "Team & Advisors", pct: 18, vesting: "4-year linear, 1-year cliff", color: "#7c3aed" },
-  { label: "Public Sale", pct: 15, vesting: "6-month linear post-TGE", color: "#6d28d9" },
-  { label: "Liquidity Provision", pct: 7, vesting: "LP locked 1yr, burned", color: "#5b21b6" },
-  { label: "Airdrop", pct: 5, vesting: "Instant at TGE", color: "#4c1d95" },
+  { label: "Community & Ecosystem", pct: 40 },
+  { label: "Protocol Development", pct: 25 },
+  { label: "Team & Advisors", pct: 15 },
+  { label: "Liquidity", pct: 10 },
+  { label: "Treasury", pct: 10 },
+];
+
+const KEY_INFO = [
+  {
+    title: "Deflationary",
+    description: "50% of protocol fees burned",
+  },
+  {
+    title: "Governance",
+    description: "Token holders vote on protocol parameters",
+  },
+  {
+    title: "Staking",
+    description: "Stake to earn protocol revenue share",
+  },
+  {
+    title: "Privacy Mining",
+    description: "Earn rewards for adding to the shielded pool",
+  },
 ];
 
 export default function Tokenomics() {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-
-  const bgY = useTransform(scrollYProgress, [0, 1], [100, -100]);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section id="tokenomics" ref={ref} className="relative py-32 md:py-44 overflow-hidden">
-      <motion.div
-        style={{ y: bgY }}
-        className="absolute right-0 top-0 w-[600px] h-[600px] rounded-full bg-accent/[0.02] blur-[160px]"
-      />
-
-      <div className="max-w-6xl mx-auto px-6">
+    <section
+      id="tokenomics"
+      ref={ref}
+      className="relative py-32 md:py-44 px-6 overflow-hidden"
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-          className="text-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-16 md:mb-20"
         >
-          <span className="text-accent text-sm font-mono tracking-widest uppercase">
-            Token
+          <span className="font-mono text-[10px] tracking-[0.3em] text-accent uppercase block mb-4">
+            TOKEN
           </span>
-          <h2 className="mt-4 text-4xl md:text-5xl font-bold tracking-tight text-gray-900">
-            $SHDW <span className="text-gradient">Tokenomics</span>
+          <h2 className="font-sans text-heading text-fg">
+            Tokenomics
           </h2>
-          <p className="mt-4 text-muted text-lg">
-            Fixed supply of{" "}
-            <span className="text-gray-900 font-mono">1,000,000,000</span> SHDW
+          <p className="font-mono text-sm text-fg-muted mt-4">
+            $SHDW — 1,000,000,000 total supply
           </p>
         </motion.div>
 
-        <div className="mt-16 grid lg:grid-cols-2 gap-12 items-center">
-          {/* Visual ring chart */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative flex items-center justify-center"
-          >
-            <svg viewBox="0 0 200 200" className="w-72 h-72 md:w-80 md:h-80">
-              {ALLOCATIONS.reduce(
-                (acc, alloc, i) => {
-                  const startAngle = acc.offset;
-                  const angle = (alloc.pct / 100) * 360;
-                  const endAngle = startAngle + angle;
-                  const r = 80;
-                  const cx = 100;
-                  const cy = 100;
-
-                  const startRad = ((startAngle - 90) * Math.PI) / 180;
-                  const endRad = ((endAngle - 90) * Math.PI) / 180;
-
-                  const x1 = cx + r * Math.cos(startRad);
-                  const y1 = cy + r * Math.sin(startRad);
-                  const x2 = cx + r * Math.cos(endRad);
-                  const y2 = cy + r * Math.sin(endRad);
-
-                  const largeArc = angle > 180 ? 1 : 0;
-
-                  acc.elements.push(
-                    <motion.path
-                      key={alloc.label}
-                      d={`M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`}
-                      fill={alloc.color}
-                      fillOpacity={0.6}
-                      stroke="#f0ece3"
-                      strokeWidth="1.5"
-                      initial={{ opacity: 0 }}
-                      animate={isInView ? { opacity: 1 } : {}}
-                      transition={{ duration: 0.5, delay: 0.4 + i * 0.1 }}
-                    />
-                  );
-
-                  acc.offset = endAngle;
-                  return acc;
-                },
-                { elements: [] as React.ReactNode[], offset: 0 }
-              ).elements}
-
-              {/* Center circle */}
-              <circle cx="100" cy="100" r="45" fill="#f0ece3" />
-              <text
-                x="100"
-                y="95"
-                textAnchor="middle"
-                fill="#111111"
-                fontSize="10"
-                fontWeight="700"
-                fontFamily="Inter"
-              >
-                SHDW
-              </text>
-              <text
-                x="100"
-                y="112"
-                textAnchor="middle"
-                fill="#6b7280"
-                fontSize="7"
-                fontFamily="monospace"
-              >
-                1B Supply
-              </text>
-            </svg>
-          </motion.div>
-
-          {/* Allocation list */}
-          <div className="space-y-4">
-            {ALLOCATIONS.map((alloc, i) => (
-              <motion.div
-                key={alloc.label}
-                initial={{ opacity: 0, x: 30 }}
-                animate={isInView ? { opacity: 1, x: 0 } : {}}
-                transition={{ duration: 0.5, delay: 0.3 + i * 0.08 }}
-                className="flex items-center gap-4 p-4 rounded-xl bg-surface/30 border border-border/30"
-              >
-                <div
-                  className="w-3 h-3 rounded-full flex-shrink-0"
-                  style={{ backgroundColor: alloc.color }}
-                />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-gray-900">
-                      {alloc.label}
-                    </span>
-                    <span className="text-sm font-mono text-accent">
-                      {alloc.pct}%
-                    </span>
-                  </div>
-                  <div className="text-xs text-muted mt-0.5">{alloc.vesting}</div>
-                </div>
-              </motion.div>
-            ))}
-
-            {/* Deflationary note */}
-            <div className="mt-4 p-4 rounded-xl border border-accent/20 bg-accent/[0.03]">
-              <div className="text-xs font-mono text-accent/70 uppercase tracking-wider mb-1">
-                Deflationary
+        {/* Allocation bars */}
+        <div className="mb-20 md:mb-28 max-w-3xl">
+          {ALLOCATIONS.map((item, i) => (
+            <motion.div
+              key={item.label}
+              initial={{ opacity: 0, x: -20 }}
+              animate={inView ? { opacity: 1, x: 0 } : {}}
+              transition={{
+                duration: 0.6,
+                delay: 0.15 + i * 0.08,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="mb-6 last:mb-0"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-mono text-sm text-fg">
+                  {item.label}
+                </span>
+                <span className="font-mono text-sm text-accent">
+                  {item.pct}%
+                </span>
               </div>
-              <p className="text-sm text-muted">
-                50% of transaction fees are burned, creating deflationary pressure
-                proportional to protocol usage. Rate adjustable by governance.
+              <div className="h-1 rounded-full bg-bg-elevated w-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={inView ? { width: `${item.pct}%` } : {}}
+                  transition={{
+                    duration: 1,
+                    delay: 0.3 + i * 0.1,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  className="h-full rounded-full bg-accent"
+                />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Key info grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {KEY_INFO.map((item, i) => (
+            <motion.div
+              key={item.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{
+                duration: 0.6,
+                delay: 0.5 + i * 0.08,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="border border-border rounded-lg bg-bg-card p-5 transition-colors duration-300 hover:border-accent/20"
+            >
+              <h4 className="font-mono text-sm text-fg mb-1">
+                {item.title}
+              </h4>
+              <p className="font-sans text-xs text-fg-muted leading-relaxed">
+                {item.description}
               </p>
-            </div>
-          </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>
